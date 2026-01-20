@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>I-consolePro</title>
+    <style>
+        :root {
+            --primary-blue: #0084ff;
+            --bg-gradient: linear-gradient(180deg, #e1f3ff 0%, #ffffff 100%);
+        }
+
+        body,
+        h1,
+        h2,
+        p {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* 顶部导航 */
+        .navbar {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            box-sizing: border-box;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            font-size: 22px;
+            color: #2c8a7e;
+        }
+
+        .logo-heart {
+            color: #ff4d4f;
+            font-size: 26px;
+            margin-right: 8px;
+        }
+
+        .nav-btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        .lang-btn,
+        .top-dl-btn {
+            border: 1px solid var(--primary-blue);
+            border-radius: 20px;
+            padding: 4px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            background: white;
+            color: #666;
+            text-decoration: none;
+        }
+
+        .top-dl-btn {
+            color: var(--primary-blue);
+        }
+
+        /* 内容区 */
+        .content {
+            text-align: center;
+            padding: 30px 24px;
+            max-width: 500px;
+        }
+
+        .main-title {
+            color: var(--primary-blue);
+            font-size: 30px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .desc {
+            color: #7a869a;
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 60px;
+        }
+
+        .dl-section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: #333;
+        }
+
+        /* 下载卡片 */
+        .dl-list {
+            width: 100%;
+            max-width: 360px;
+            margin: 0 auto;
+        }
+
+        .dl-card {
+            background: white;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            padding: 16px 25px;
+            margin-bottom: 16px;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(0, 132, 255, 0.08);
+            transition: all 0.2s;
+            border: none;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .dl-card:active {
+            transform: scale(0.97);
+            background: #f9f9f9;
+        }
+
+        .card-icon {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+        }
+
+        .card-label {
+            flex: 1;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        /* 各平台颜色 */
+        .label-google {
+            color: #34a853;
+        }
+
+        .label-ios {
+            color: #34a853;
+        }
+
+        .label-local {
+            color: #34a853;
+        }
+
+        /* --- 弹窗样式 --- */
+
+        /* 1. 右上角引导提示框 */
+        .guide-overlay {
+            position: fixed;
+            top: 70px;
+            left: 5%;
+            right: 5%;
+            background: rgba(51, 51, 51, 0.95);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            z-index: 1000;
+            display: none;
+            /* 默认隐藏 */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .guide-overlay::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid rgba(51, 51, 51, 0.95);
+        }
+
+        /* 2. iOS 暂未开放弹窗 */
+        .modal-mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-content {
+            background: white;
+            width: 280px;
+            border-radius: 15px;
+            text-align: center;
+            padding: 30px 20px 20px;
+        }
+
+        .modal-text {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 25px;
+        }
+
+        .modal-btn {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        /* 加载提示样式 */
+        .loading-toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 3000;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="guideBox" class="guide-overlay">
+        <span data-zh='点击右上角按钮，然后在弹出的菜单中，点击"在浏览器中打开"或者点击"复制链接"在浏览器中打开，即可安装'
+            data-en='Click the button in the upper right corner, then click "Open in Browser" or "Copy Link" to install.'>
+            点击右上角按钮，然后在弹出的菜单中，点击"在浏览器中打开"或者点击"复制链接"在浏览器中打开，即可安装
+        </span>
+    </div>
+
+    <div id="iosModal" class="modal-mask">
+        <div class="modal-content">
+            <div class="modal-text" data-zh="暂未开放" data-en="Not yet available">暂未开放</div>
+            <button class="modal-btn" onclick="closeModal()" data-zh="确定" data-en="OK">确定</button>
+        </div>
+    </div>
+
+    <!-- 新增加载提示 -->
+    <div id="loadingToast" class="loading-toast" data-zh="正在获取下载链接..." data-en="Getting download link...">
+        正在获取下载链接...
+    </div>
+
+    <nav class="navbar">
+        <div class="logo">
+            <img src="./画板 4.png"></img>
+        </div>
+        <div class="nav-btns">
+            <button class="lang-btn" onclick="toggleLang()" id="langSwitcher">中文</button>
+        </div>
+    </nav>
+
+    <main class="content">
+        <h1 class="main-title" data-zh="智能健身,科学训练" data-en="Smart Fitness, Scientific Training">智能健身,科学训练</h1>
+        <p class="desc" data-zh="I-consolePro 是您的私人健身教练,通过AI技术为您提供个性化训练计划,实时数据监测,让健身更高效、更有趣。"
+            data-en="I-consolePro is your private fitness coach, providing personalized training plans and real-time data monitoring through AI technology, making fitness more efficient and fun.">
+            I-consolePro 是您的私人健身教练，通过AI技术为您提供个性化训练计划,实时数据监测,让健身更高效、更有趣。
+        </p>
+
+        <h2 class="dl-section-title" data-zh="下载方式" data-en="Download Methods">下载方式</h2>
+
+        <div class="dl-list">
+            <!-- 谷歌下载按钮：绑定专属方法 -->
+            <button class="dl-card" onclick="handleGoogleDownload()">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/Google_Play_Arrow_logo.svg"
+                    class="card-icon">
+                <span class="card-label label-google" data-zh="谷歌下载" data-en="Google Play">谷歌下载</span>
+            </button>
+
+            <!-- iOS下载按钮：保持原有逻辑 -->
+            <button class="dl-card" onclick="showIosAlert()">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/67/App_Store_%28iOS%29.svg"
+                    class="card-icon">
+                <span class="card-label label-ios" data-zh="iOS下载" data-en="iOS Download">iOS下载</span>
+            </button>
+
+            <!-- 本地下载按钮：绑定专属方法 -->
+            <button class="dl-card" onclick="handleLocalDownload()">
+                <img src="./logo-20.svg" style="width: 30px; height: 30px; border-radius: 50%; object-fit: contain;"
+                    alt="I-consolePro图标">
+                <span class="card-label label-local" data-zh="本地下载" data-en="Local Download">本地下载</span>
+            </button>
+        </div>
+    </main>
+
+    <script>
+        let currentLang = 'zh';
+        let guideTimer = null;
+
+        // 切换语言逻辑
+        function toggleLang() {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            document.getElementById('langSwitcher').innerText = currentLang === 'zh' ? '中文' : 'English';
+
+            // 遍历所有带有 data-zh 的元素
+            document.querySelectorAll('[data-zh]').forEach(el => {
+                el.innerText = el.getAttribute(`data-${currentLang}`);
+            });
+        }
+
+        // 显示右上角引导
+        function showGuide() {
+            const guide = document.getElementById('guideBox');
+            guide.style.display = 'block';
+
+            // 如果已有计时器则清除重置
+            if (guideTimer) clearTimeout(guideTimer);
+
+            guideTimer = setTimeout(() => {
+                guide.style.display = 'none';
+            }, 5000); // 5秒后隐藏
+        }
+
+        // 显示iOS警告
+        function showIosAlert() {
+            document.getElementById('iosModal').style.display = 'flex';
+        }
+
+        // 关闭弹窗
+        function closeModal() {
+            document.getElementById('iosModal').style.display = 'none';
+        }
+
+        // 点击遮罩层也可以关闭弹窗
+        window.onclick = function (event) {
+            const modal = document.getElementById('iosModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // ========== 新增：谷歌下载逻辑 ==========
+        function handleGoogleDownload() {
+            // 先显示引导提示，再跳转谷歌商店
+            showGuide();
+            setTimeout(() => {
+                window.location.href = 'https://play.google.com/store/apps/details?id=com.bs.iconsolepro';
+            }, 500); // 延迟500ms，确保用户能看到引导提示
+        }
+
+        // ========== 新增：本地下载逻辑 ==========
+        async function handleLocalDownload() {
+            // 1. 显示引导提示和加载中提示
+            showGuide();
+            const loadingToast = document.getElementById('loadingToast');
+            loadingToast.innerText = loadingToast.getAttribute(`data-${currentLang}`);
+            loadingToast.style.display = 'block';
+
+            try {
+                // 2. 发起请求获取下载链接
+                const response = await fetch('https://api.bosfits.com/apk/getApkById?group_id=00.0a');
+
+                // 检查请求是否成功
+                if (!response.ok) {
+                    throw new Error(`请求失败：${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // 3. 检查接口返回是否包含下载链接
+                if (data.code === 200 && data.data?.download_url) {
+                    // 跳转到真实下载地址
+                    window.location.href = data.data.download_url;
+                } else {
+                    // 提示用户获取失败
+                    alert(currentLang === 'zh' ? '获取下载链接失败，请稍后重试' : 'Failed to get download link, please try again later');
+                }
+            } catch (error) {
+                console.error('本地下载请求错误:', error);
+                // 网络错误提示（多语言）
+                alert(currentLang === 'zh' ? '网络请求失败，请检查网络连接' : 'Network request failed, please check your network connection');
+            } finally {
+                // 4. 隐藏加载提示
+                loadingToast.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+
+</html>
