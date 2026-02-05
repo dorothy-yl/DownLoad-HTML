@@ -114,43 +114,48 @@
             align-items: center;
         }
 
-        .dl-card {
-            background: white;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            /* 整体居中 */
-            padding: 16px 12px;
-            /* 紧凑内边距 */
-            margin-bottom: 16px;
-            text-decoration: none;
-            box-shadow: 0 4px 12px rgba(0, 132, 255, 0.08);
-            transition: all 0.2s;
-            border: none;
-            max-width: 250px;
-            width: 100%;
-            height: 50px;
-            cursor: pointer;
-        }
+       /* 1. 修改卡片布局 */
+.dl-card {
+    background: white;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    /* 改为靠左对齐 */
+    justify-content: flex-start; 
+    /* 增加左边距，让整体内容居中感更强，数值可根据喜好调整 */
+    padding: 0 40px; 
+    margin-bottom: 16px;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0, 132, 255, 0.08);
+    transition: all 0.2s;
+    border: none;
+    max-width: 250px;
+    width: 100%;
+    height: 50px;
+    cursor: pointer;
+    /* 必须加这个，否则 padding 会撑开宽度 */
+    box-sizing: border-box; 
+}
 
-        .dl-card:active {
-            transform: scale(0.97);
-            background: #f9f9f9;
-        }
+/* 2. 强制图标容器等宽（关键：解决对齐问题） */
+.card-icon {
+    width: 32px;
+    height: 32px;
+    min-width: 32px; /* 确保图标不被挤压 */
+    object-fit: contain;
+    /* 移除可能的默认边距 */
+    margin: 0; 
+}
 
-        .card-icon {
-            width: 32px;
-            height: 32px;
-            object-fit: contain;
-        }
-
-        .card-label {
-            font-size: 18px;
-            font-weight: 500;
-            margin-left: 10px;
-            /* 图标和文字紧凑间距 */
-        }
+/* 3. 设置统一的文字间距（关键：解决中英文间距过大问题） */
+.card-label {
+    font-size: 18px;
+    font-weight: 500;
+    /* 统一设置左边距，不再依赖父元素的 space-around */
+    margin-left: 15px; 
+    /* 确保文字不会换行 */
+    white-space: nowrap; 
+}
 
         /* 各平台颜色 */
         .label-google {
@@ -303,14 +308,14 @@
             </button>
             <!-- 谷歌下载按钮 -->
             <button class="dl-card" id="googleDownloadBtn">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/Google_Play_Arrow_logo.svg"
+                <img src="./谷歌 .svg"
                     class="card-icon">
                 <span class="card-label label-google" data-zh="谷歌下载" data-en="Google Download">谷歌下载</span>
             </button>
 
             <!-- iOS下载按钮 -->
             <button class="dl-card" id="iosDownloadBtn">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/6/67/App_Store_%28iOS%29.svg"
+                <img src="./AppStore.svg"
                     class="card-icon">
                 <span class="card-label label-ios" data-zh="iOS下载" data-en="iOS Download">iOS下载</span>
             </button>
